@@ -1,0 +1,43 @@
+#version 150
+
+uniform mat4 camera;
+uniform mat4 model;
+uniform vec3 cameraPos;
+//uniform int time;
+
+in vec3 vert;
+in float accel;
+in float ID;
+//in float rand;
+
+out vec3 fragvert;
+out float colorAccel;
+out float colorID;
+//out float colorRand;
+
+void main() {
+    fragvert = vert;
+    colorAccel = accel;
+    colorID = ID;
+    //colorRand = rand;
+    float distFromCam = sqrt((cameraPos.x-vert.x)*(cameraPos.x-vert.x) + (cameraPos.y-vert.y)*(cameraPos.y-vert.y) + (cameraPos.z-vert.z)*(cameraPos.z-vert.z));
+    
+    float size;
+    if (colorID == 0.0 || colorID == 3.0) {
+        size = 600.0;
+    } else if (colorID == 1.0 || colorID == 4.0) {
+        size = 400.0;
+    } else if (colorID == 2.0 || colorID == 5.0) {
+        size = 1000.0;
+    }
+      
+    
+    /*
+    if (ID == 0.0)
+        size += 50*sin(float(((int(rand)+time)%100)/99)/3.14159);
+     */
+    
+    gl_Position = camera * model * vec4(vert, 1);
+    
+    gl_PointSize = size/(distFromCam*1.19175359259);          // last number is tan(50.0 degrees);
+}

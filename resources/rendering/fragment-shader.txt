@@ -1,0 +1,157 @@
+#version 150
+
+uniform int mapMode;
+uniform vec3 center;
+uniform int revIndex;
+uniform vec3 lightDir;
+
+in vec3 fragvert;
+in float colorAccel;
+in float colorID;
+//in float colorRand;
+
+out vec4 finalColor;
+
+float Ns = 5;
+vec4 mat_specular=vec4(1);
+vec4 light_specular=vec4(1);
+
+void main() {
+  
+  if (colorID == -1.0)
+    discard;
+
+    vec3 N;
+    N.xy = gl_PointCoord* 2.0 - vec2(1.0);
+    float mag = dot(N.xy, N.xy);
+    
+    // line sparkles
+    /*
+    if (colorID == 0.0) {
+        if (int(colorRand)%5==1) {
+            //if (abs(N.x-N.y) < 0.1) mag=3.3*sqrt(abs(N.x-N.y))*dot(N.xy, N.xy);
+            if (abs(N.x+N.y) < 0.03) mag=7.3*sqrt(abs(N.x+N.y))*dot(N.xy, N.xy);
+        } else if (int(colorRand)%5==2) {
+            if (abs(N.x-N.y) < 0.03) mag=7.3*sqrt(abs(N.x-N.y))*dot(N.xy, N.xy);
+            //if (abs(N.x+N.y) < 0.1) mag=3.3*sqrt(abs(N.x+N.y))*dot(N.xy, N.xy);
+        } else if (int(colorRand)%5==3) {
+            if (abs(N.x) < 0.01) mag=9.1*sqrt(abs(N.x))*dot(N.xy, N.xy);
+            //if (abs(N.x+N.y) < 0.1) mag=3.3*sqrt(abs(N.x+N.y))*dot(N.xy, N.xy);
+        }else if (int(colorRand)%5==4) {
+            if (abs(N.y) < 0.01) mag=9.1*sqrt(abs(N.y))*dot(N.xy, N.xy);
+            //if (abs(N.x+N.y) < 0.1) mag=3.3*sqrt(abs(N.x+N.y))*dot(N.xy, N.xy);
+        }
+    }
+     */
+    
+    //if (colorID == 2.0)
+    if (mag > 1.0) discard;   // kill pixels outside circle
+    
+    if (colorID == 0.0)
+        if (mag>.8) discard;
+    
+    N.z = sqrt(1.0-mag);
+
+
+    float diffuse = max(0.0, dot(lightDir, N));
+    //diffuse *= 2*diffuse;
+
+    vec3 eye = vec3 (0.0, 0.0, 1.0);
+    vec3 halfVector = normalize(eye + lightDir);
+    float spec = max( pow(dot(N,halfVector), Ns), 0.0);
+    vec4 S = light_specular*mat_specular* spec;
+
+    vec3 sep = vec3((fragvert.x-center.x),(fragvert.y-center.y),(fragvert.z-center.z));
+    float dist = length(sep);
+    dist *= 10.0;
+    float density = pow(dist, 3.0)*pow(1.0+pow(dist,2),-3.0/2.0);
+    
+    float red = 0.0;
+    float green = 0.0;
+    float blue = 0.0;
+    float alpha = 0.0;
+    
+    if (colorID == 0.0 || colorID == 3.0) {
+        red = 0.15;
+        green = 0.15;
+        blue = 1.0;
+        alpha = 0.65;
+    } else if (colorID == 1.0 || colorID == 4.0) {
+        red = 0.95;
+        green = 0.95;
+        blue = 0.85;
+        alpha = 0.2;
+    } else if (colorID == 2.0 || colorID == 5.0) {
+        red = 0.2;
+        green = 0.2;
+        blue = 1.0;
+        alpha = 0.17;
+    }
+    if(mapMode == 1) {                                                                     // 1: original
+    
+    } else if (mapMode == 2) {                                                              // 2: acceleration mapping
+        green += 1.0- 0.25*sqrt(colorAccel);
+        red += 1.0*sqrt(sqrt(colorAccel));
+        blue = 0.1;
+    }
+    else if (mapMode == 3) {                                                             // 3: distance from center (will be more useful in multiple center systems)
+        dist /= 20.0;
+        finalColor = vec4(0.8-0.4*dist,0.8-0.4*dist,0.2 + 0.8*dist,0.5-0.05*dist);
+    } else if (mapMode == 4) {                                                              // 4: separate galaxies
+        if (colorID < 3.0) {
+            red /= 3.0;
+            green *= 3.0;
+        } else if (colorID > 2.0) {
+            red *= 3.0;
+            green /= 3.0;
+        }
+    } else if (mapMode == 5) {
+        
+    }
+    
+    finalColor = vec4(red, green, blue, alpha);
+
+    if (!(revIndex==-1 || revIndex==colorID)) {
+        finalColor *= 0.6;
+        //finalColor[3] *= 0.4;
+    }
+
+    if (revIndex == colorID) {
+        finalColor *= 1.8;
+        //finalColor[3] *= 1.5;
+    }
+
+    finalColor *= (diffuse + S);
+    
+    if (colorID == 2.0 || colorID == 5.0) {
+        finalColor[3] -= 0.5;
+        finalColor[3] *= finalColor[3];
+    }
+    
+    if (colorID == 0.0 || colorID == 3.0) {
+        finalColor[3] -= 0.6;
+        finalColor[3] *= finalColor[3];
+    }
+    finalColor[3] *= 0.7*finalColor[3];
+    
+    /*
+    if (colorID == 0.0)
+        finalColor[3] -= 0.005*(int(colorRand)%3);
+     */
+    
+    /*
+    if (colorID == 0.0) {
+        if (int(colorRand)%10000 == 0.0) {
+            finalColor *= 3.0;
+        }
+    }
+     */
+    
+    float gamma = 1.0/2.2;
+    if (colorID != 2.0 && colorID != 5.0) {
+        finalColor[0] = pow(finalColor[0],gamma);
+        finalColor[1] = pow(finalColor[1],gamma);
+        finalColor[2] = pow(finalColor[2],gamma);
+    }
+    
+}
