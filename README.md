@@ -22,7 +22,13 @@
    
    ### 2.3 Set Initialization
    
+   As I mentioned above, I used the galactics package in order to generate galaxies of 16k particles. In order to be able to simulate any sort of galaxy collision, I need to be able to generate a set of initial conditions that:
    
+   1. Contained an arbitrary number of galaxies
+   2. Each galaxy could have a net velocity in any direction
+   3. Each galaxy could be rotated an arbitrary amount along an arbitrary axis
+  
+  In order to accomplish this, I used a 
    
    ### 2.4 Batch Initialization
    
