@@ -49,6 +49,8 @@
    
    ### 2.6 Barnes-Hut version (alternate)
    
+   I won't explain the algorith here (great resource is http://www.cs.princeton.edu/courses/archive/fall03/cs126/assignments/barnes-hut.html). Just an interesting program that I thought would be fun to create, and runs fully on the CPU.
+   
   ## 3.0 Graphical Rendering (OpenGL)
   
   The fun part! Tom Dalling created an awesome series of OpenGL tutorials (linked in credits), where I learned not just about OpenGL, but many of the fundamentals of computer graphics techniques. Again, Tom has already created a great resource, so I will only talk about the specific details to my implementation.
@@ -87,8 +89,12 @@ A very fun feature was being able to map "color modes" to various number keys. A
    
 #### 3.42 Time Indexing
    
-The most tactically satisfying feature was mapping control of the time index onto keys, allowing real time control of the simulation. Mapping the actions of run, stop, forward, and backward onto keys, allowed complete control of the viewing of the time evolution of the system. and with the freedom of the camera, allowed full freedom to analyze interesting configurations from various angles in real time. 
+The most tactilely satisfying feature was mapping control of the time index onto keys, allowing real time control of the simulation. Mapping the actions of run, stop, forward, and backward onto keys, allowed complete control of the viewing of the time evolution of the system. and with the freedom of the camera, allowed full freedom to analyze interesting configurations from various angles in real time. 
   
+#### 3.43 Real Time Control (just for fun)
+
+A very fun (but not particularly useful) feature was mapping full control of a massive object to keys, and being able to mess with and interact with the system in real time.
+
 # Credits
 
 Special Thanks to Shane Aldas, Kyle Lewis, and Kelsi Lund, my group members who made invaluable contributions to our original projects for our UCSD class PHYS 141.
