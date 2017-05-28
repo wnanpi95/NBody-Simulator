@@ -73,6 +73,22 @@
   
   Unfortunately, artifacts due to transparency were out of the scope of Tom's tutorial. After some time examining the rendering for some time, from many different angles, I had the insight that perhaps it had to do with the order that the particles were being drawn, as the artifacts only appeared from some viewing angles. 
   
+  With the problem now identified, I could properly explore solutions. The first attempt was using a painter's algorithm, which involves sorting the particles by their distance from the camera, and rendering the further ones first. Using a naive implementation, there issues with particles disappearing and reappearing. The next attempt involved turning off depth testing, which culls pixels that are "behind" already drawn pixels. While this looked significantly better than before, it created strange effects at certain angles that destroyed the illusion of a three dimensional object.
+  
+  The final solution I realized had to come from using the painter's algorithm, so I began a thorough investigation of the issue. After some more time investigating the rendering, I noticed an interesting effect. The rendering would come out perfectly in a small ring around the center of wherever the camera pointed. I then remembered that the view was rendered using a projected frustum rather than an orthogonal projection (for more details, visit Tom's blog), which was creating an "inverted" layer when using the naive painter's algorithm. After some thought, I realized the issue could be fixed by sorting the rendering order by the distance of the particles from the camera, projected on the camera's viewing ray (dot product of separation vector between camera and particle, and direction camera is pointing), as this sorting would preserve the proper order after undergoing the projection transformation. There is an unfortunate bottle neck in rendering time involving the sorting everytime the camera is shifted now, but it finally came out the way I envisioned!
+  
+  ### 3.4 Miscellaneous features
+  
+  This part was a lot of fun for me. Here I explored the features of the GLFW windowing system, and had a lot of fun creating various features that really brought the project to another level, with comparatively smaller effort. A wonderful feature was being able to assign actions to various keys, which allowed real time input on the simulation
+    
+    #### 3.41 Color Mapping
+    
+   A very fun feature was being able to map "color modes" to various number keys. At the press of certain numbers, the particles in the system could be colored by various modes. One example was being able to color the particles by the magnitude of the gravitational acceleration exerted on it. This allows viewers to be able to visualize the tidal forces exerted across a galactic system when passing another, a very important phenomena in the final state of the collision. Another color mode allows different coloring for individual galaxies, in order to track the origination of various particles, allowing viewers to observe the blending and cannibalization that occurs during collision. Similarly, another mode allows the highlighting of individual galaxies, so that the full evolution of a particular galaxy could be observed.
+   
+   #### 3.42 Time Indexing
+   
+   The most tactically satisfying feature was mapping control of the time index onto keys, allowing real time control of the simulation. Mapping the actions of run, stop, forward, and backward onto keys, allowed complete control of the viewing of the time evolution of the system. and with the freedom of the camera, allowed full freedom to analyze interesting configurations from various angles in real time. 
+  
 # Credits
 
 Special Thanks to Shane Aldas, Kyle Lewis, and Kelsi Lund, my group members who made invaluable contributions to our original projects for our UCSD class PHYS 141.
